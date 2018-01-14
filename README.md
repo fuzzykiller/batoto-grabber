@@ -18,4 +18,8 @@ You could use something like “SQLite Browser” to inspect the data.
 
 ## How does it work?
 
-This is a Windows application, written in C#/.NET. It’s centered around an embedded Chromium browser using the CefSharp library.
+This is a Windows application, written in C#/.NET. It’s centered around an embedded Chromium browser using the CefSharp library. It will simply visit all relevant pages and pull data using JavaScript snippets.
+
+## But I don’t use Windows!
+
+You can always use the JavaScript code (located in BatotoGrabber/Scripts/) to create your own tool!
