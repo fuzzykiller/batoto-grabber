@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2020
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatotoGrabber", "BatotoGrabber\BatotoGrabber.csproj", "{29E2DA60-E7FA-483D-AE96-465EF5729133}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{29E2DA60-E7FA-483D-AE96-465EF5729133}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{29E2DA60-E7FA-483D-AE96-465EF5729133}.Debug|x86.ActiveCfg = Debug|x86
+		{29E2DA60-E7FA-483D-AE96-465EF5729133}.Debug|x86.Build.0 = Debug|x86
+		{29E2DA60-E7FA-483D-AE96-465EF5729133}.Release|Any CPU.ActiveCfg = Release|x86
+		{29E2DA60-E7FA-483D-AE96-465EF5729133}.Release|x86.ActiveCfg = Release|x86
+		{29E2DA60-E7FA-483D-AE96-465EF5729133}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7947C1DF-F945-4934-859C-0A1776DB3D12}
+	EndGlobalSection
+EndGlobal
