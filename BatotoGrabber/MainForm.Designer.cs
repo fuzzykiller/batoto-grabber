@@ -103,8 +103,9 @@
             this.statusLabel.Name = "statusLabel";
             this.statusLabel.Size = new System.Drawing.Size(259, 23);
             this.statusLabel.TabIndex = 1;
-            this.statusLabel.Text = "label1";
+            this.statusLabel.Text = "Ready";
             this.statusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.statusLabel.UseMnemonic = false;
             // 
             // startButton
             // 
