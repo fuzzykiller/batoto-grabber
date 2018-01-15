@@ -112,7 +112,27 @@ namespace BatotoGrabber
         
         public async Task<GroupInfo> GetGroupInfo(GroupRef groupRef)
         {
-            await _browserControl.LoadUrl(groupRef.Url);
+            int httpStatus;
+            do
+            {
+                httpStatus = await _browserControl.LoadUrl(groupRef.Url);
+                if (httpStatus > 500)
+                {
+                    await Task.Delay(10000);
+                }
+            } while (httpStatus > 500);
+
+            if (httpStatus > 300)
+            {
+                return new GroupInfo
+                {
+                    Name = groupRef.Name,
+                    Description = "This group has been removed from Batoto. :(",
+                    Delay = "Unknown",
+                    Url = groupRef.Url,
+                    Website = "Unknown"
+                };
+            }
 
             var result = await _browserControl.EvaluateScriptAsyncEx(Scripts.Script.GetGroupInfo);
 
