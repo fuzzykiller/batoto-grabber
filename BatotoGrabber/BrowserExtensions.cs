@@ -7,22 +7,19 @@ namespace BatotoGrabber
 {
     public static class BrowserExtensions
     {
-        public static Task LoadUrl(this ChromiumWebBrowser browser, string url)
+        public static Task<int> LoadUrl(this ChromiumWebBrowser browser, string url)
         {
-            var tcs = new TaskCompletionSource<object>();
+            var tcs = new TaskCompletionSource<int>();
             browser.FrameLoadEnd += OnFrameLoadEnd;
             browser.Load(url);
 
             return tcs.Task;
 
-            void OnFrameLoadEnd(object sender, FrameLoadEndEventArgs frameLoadEndEventArgs)
+            void OnFrameLoadEnd(object sender, FrameLoadEndEventArgs eventArgs)
             {
-                var success = frameLoadEndEventArgs.HttpStatusCode >= 200 &&
-                              frameLoadEndEventArgs.HttpStatusCode <= 200;
-
-                if (frameLoadEndEventArgs.Frame.IsMain && success)
+                if (eventArgs.Frame.IsMain)
                 {
-                    tcs.SetResult(null);
+                    tcs.SetResult(eventArgs.HttpStatusCode);
                     browser.FrameLoadEnd -= OnFrameLoadEnd;
                 }
             }

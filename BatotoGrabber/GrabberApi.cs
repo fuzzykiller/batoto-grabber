@@ -27,7 +27,32 @@ namespace BatotoGrabber
 
         public async Task<SeriesInfo> GetSeriesInfo(FollowedSeries series)
         {
-            await _browserControl.LoadUrl(series.Url);
+            int httpStatus;
+            do
+            {
+                httpStatus = await _browserControl.LoadUrl(series.Url);
+                if (httpStatus > 500)
+                {
+                    await Task.Delay(10000);
+                }
+            } while (httpStatus > 500);
+
+            if (httpStatus > 300)
+            {
+                return new SeriesInfo
+                {
+                    Name = series.Name,
+                    AltNames = new string[0],
+                    Artists = new string[0],
+                    Authors = new string[0],
+                    Status = "Not Found",
+                    Type = "Unknown",
+                    Genres = new string[0],
+                    Description = "This series has been removed from Batoto. Your “My Follows” list contains a dead link. :(",
+                    Chapters = new ChapterInfo[0],
+                    Image = null
+                };
+            }
 
             var result = await _browserControl.EvaluateScriptAsyncEx(Scripts.Script.GetSeriesInfo);
 
