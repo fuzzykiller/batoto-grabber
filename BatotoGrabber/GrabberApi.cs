@@ -35,7 +35,7 @@ namespace BatotoGrabber
                 {
                     await Task.Delay(10000);
                 }
-            } while (httpStatus > 500);
+            } while (httpStatus > 500 || httpStatus < 200);
 
             if (httpStatus > 300)
             {
@@ -120,7 +120,7 @@ namespace BatotoGrabber
                 {
                     await Task.Delay(10000);
                 }
-            } while (httpStatus > 500);
+            } while (httpStatus > 500 || httpStatus < 200);
 
             if (httpStatus > 300)
             {

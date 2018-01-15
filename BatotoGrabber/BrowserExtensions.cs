@@ -7,13 +7,15 @@ namespace BatotoGrabber
 {
     public static class BrowserExtensions
     {
-        public static Task<int> LoadUrl(this ChromiumWebBrowser browser, string url)
+        public static async Task<int> LoadUrl(this ChromiumWebBrowser browser, string url)
         {
             var tcs = new TaskCompletionSource<int>();
             browser.FrameLoadEnd += OnFrameLoadEnd;
             browser.Load(url);
 
-            return tcs.Task;
+            var wait30Seconds = Task.Delay(30000).ContinueWith(t => -1);
+            var task = await Task.WhenAny(tcs.Task, wait30Seconds);
+            return await task;
 
             void OnFrameLoadEnd(object sender, FrameLoadEndEventArgs eventArgs)
             {
