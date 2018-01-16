@@ -46,8 +46,9 @@
 			title: titleCell.textContent.trim(),
 			language: languageCell.querySelector("div").title,
 			groups: groupInfos,
-			date: dateCell.textContent.trim()
 			contributor: contributorCell.textContent.trim(),
+			date: dateCell.textContent.trim(),
+			url: titleCell.querySelector("a").href
 		};
 	}
 

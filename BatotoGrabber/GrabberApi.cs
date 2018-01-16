@@ -33,6 +33,21 @@ namespace BatotoGrabber
             return followedSeries;
         }
 
+        public async Task<Dictionary<string, FollowedSeriesLastRead>> GetFollowedSeriesLastRead()
+        {
+            await _browserControl.LoadUrl("https://bato.to/follows_comics");
+
+            var response = await _browserControl.EvaluateScriptAsyncEx(Script.GetFollowedSeriesLastRead);
+            var lastReads = JsonConvert.DeserializeObject<FollowedSeriesLastRead[]>((string)response);
+
+            // Work around quirks: One type of deleted series all have the same URL as "last read"
+            var lastReadsByChapterUrl = lastReads.GroupBy(x => x.LastReadChapterUrl)
+                .Where(x => x.Count() == 1 && x.Key != null)
+                .ToDictionary(x => x.Key, x => x.Single());
+
+            return lastReadsByChapterUrl;
+        }
+
         public async Task<SeriesInfo> GetSeriesInfo(FollowedSeries series)
         {
             int httpStatus;
@@ -62,7 +77,7 @@ namespace BatotoGrabber
                 };
             }
 
-            var result = await _browserControl.EvaluateScriptAsyncEx(Scripts.Script.GetSeriesInfo);
+            var result = await _browserControl.EvaluateScriptAsyncEx(Script.GetSeriesInfo);
 
             var rawInfo = JsonConvert.DeserializeObject<ProtoSeriesInfo>((string)result);
 
@@ -142,7 +157,7 @@ namespace BatotoGrabber
                 };
             }
 
-            var result = await _browserControl.EvaluateScriptAsyncEx(Scripts.Script.GetGroupInfo);
+            var result = await _browserControl.EvaluateScriptAsyncEx(Script.GetGroupInfo);
 
             var rawInfo = JsonConvert.DeserializeObject<KeyValuePair<string, string>[]>((string)result);
 

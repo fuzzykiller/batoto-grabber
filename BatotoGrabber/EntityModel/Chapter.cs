@@ -14,6 +14,7 @@ namespace BatotoGrabber.EntityModel
         public string Language { get; set; }
         public string Contributor { get; set; }
         public string Date { get; set; }
+        public string LastRead { get; set; }
 
         public virtual List<Group> Groups { get; set; }
 

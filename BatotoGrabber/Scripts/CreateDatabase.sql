@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS `Chapters` (
 	`Contributor`	TEXT,
 	`Date`	TEXT,
 	`Series`	TEXT NOT NULL,
+	`LastRead`	TEXT,
 	PRIMARY KEY(`Id`),
 	FOREIGN KEY(`Series`) REFERENCES `Series`(`PrimaryName`)
 );

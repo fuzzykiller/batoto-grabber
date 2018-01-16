@@ -8,6 +8,7 @@ namespace BatotoGrabber.Scripts
         public static string GetSeriesInfo => GetResource("GetSeriesInfo.js");
         public static string GetGroupInfo => GetResource("GetGroupInfo.js");
         public static string CreateDatabbase => GetResource("CreateDatabase.sql");
+        public static string GetFollowedSeriesLastRead => GetResource("GetFollowedSeriesLastRead.js");
 
         private static string GetResource(string localName)
         {

@@ -7,5 +7,6 @@
         public GroupRef[] Groups { get; set; }
         public string Contributor { get; set; }
         public string Date { get; set; }
+        public string Url { get; set; }
     }
 }

@@ -47,12 +47,11 @@ namespace BatotoGrabber
         {
             try
             {
-                await _browserControl.LoadUrl("https://bato.to/myfollows");
-
                 var grabberControl = new GrabberApi(_browserControl);
                 progressBar.Style = ProgressBarStyle.Marquee;
                 statusLabel.Text = "Fetch followed series...";
                 var followedSeries = await grabberControl.GetFollowedSeries();
+                var lastReads = await grabberControl.GetFollowedSeriesLastRead();
 
                 if (followedSeries.Length == 0)
                 {
@@ -126,7 +125,7 @@ namespace BatotoGrabber
                                 ctx.CreateDatabase();
                             }
 
-                            DbContext.SaveToDatabase(ctx, seriesInfos, groupInfos);
+                            DbContext.SaveToDatabase(ctx, seriesInfos, groupInfos, lastReads);
                         }
                     }
                 }

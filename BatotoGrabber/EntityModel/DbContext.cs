@@ -61,7 +61,11 @@ namespace BatotoGrabber.EntityModel
             return new SQLiteConnection(csb.ToString());
         }
 
-        public static void SaveToDatabase(DbContext ctx, IReadOnlyCollection<SeriesInfo> seriesInfos, IEnumerable<GroupInfo> groupInfos)
+        public static void SaveToDatabase(
+            DbContext ctx,
+            IReadOnlyCollection<SeriesInfo> seriesInfos,
+            IEnumerable<GroupInfo> groupInfos,
+            Dictionary<string, FollowedSeriesLastRead> lastReads)
         {
             var genres = seriesInfos.SelectMany(x => x.Genres)
                 .Distinct()
@@ -73,6 +77,7 @@ namespace BatotoGrabber.EntityModel
                 .Concat(seriesInfos.SelectMany(x => x.Artists))
                 .Distinct()
                 .ToDictionary(x => x, x => new Creator { Name = x });
+
             var series = seriesInfos.Select(
                 s => new Series
                 {
@@ -90,7 +95,10 @@ namespace BatotoGrabber.EntityModel
                                 Contributor = c.Contributor,
                                 Date = c.Date,
                                 Language = c.Language,
-                                Groups = groups.GetMany(c.Groups.Select(g => g.Url)).ToList()
+                                Groups = groups.GetMany(c.Groups.Select(g => g.Url)).ToList(),
+                                LastRead = c.Url != null && lastReads.TryGetValue(c.Url, out var lr)
+                                    ? lr.LastReadDate
+                                    : null
                             })
                         .ToList(),
                     Image = s.Image
