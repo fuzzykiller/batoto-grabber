@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using BatotoGrabber.Model;
+using BatotoGrabber.Scripts;
 using CefSharp.WinForms;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
@@ -20,9 +21,16 @@ namespace BatotoGrabber
 
         public async Task<FollowedSeries[]> GetFollowedSeries()
         {
-            var response = await _browserControl.EvaluateScriptAsyncEx(Scripts.Script.GetFollowedSeries);
+            await _browserControl.LoadUrl("https://bato.to/myfollows");
 
-            return JsonConvert.DeserializeObject<FollowedSeries[]>((string)response);
+            var response = await _browserControl.EvaluateScriptAsyncEx(Script.GetFollowedSeries);
+            var followedSeries = JsonConvert.DeserializeObject<FollowedSeries[]>((string)response);
+
+            followedSeries = followedSeries.Where(
+                    x => !string.IsNullOrWhiteSpace(x.Name) && x.Url != "http://bato.to/comic/_/comics/-r")
+                .ToArray();
+
+            return followedSeries;
         }
 
         public async Task<SeriesInfo> GetSeriesInfo(FollowedSeries series)
