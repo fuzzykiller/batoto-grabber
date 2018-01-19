@@ -1,26 +1,17 @@
 ﻿using System.Collections.Generic;
-using System.Data;
+using System.Data.Common;
 using System.Data.Entity;
-using System.Data.SQLite;
 using System.Linq;
+using System.Threading.Tasks;
 using BatotoGrabber.Model;
-using BatotoGrabber.Scripts;
 
 namespace BatotoGrabber.EntityModel
 {
     public class DbContext : System.Data.Entity.DbContext
     {
-        private readonly SQLiteConnection _dbConnection;
-
-        public DbContext(string databaseFile)
-            : this(CreateConnection(databaseFile))
+        public DbContext(DbConnection dbConnection) 
+            : base(dbConnection, false)
         {
-        }
-
-        private DbContext(SQLiteConnection dbConnection) 
-            : base(dbConnection, true)
-        {
-            _dbConnection = dbConnection;
         }
 
         public DbSet<Chapter> Chapters { get; set; }
@@ -29,40 +20,12 @@ namespace BatotoGrabber.EntityModel
         public DbSet<Group> Groups { get; set; }
         public DbSet<Series> Series { get; set; }
 
-        public void CreateDatabase()
-        {
-            var previousState = _dbConnection.State;
-            if (previousState != ConnectionState.Open)
-            {
-                _dbConnection.Open();
-            }
-
-            using (var cmd = _dbConnection.CreateCommand())
-            {
-                cmd.CommandText = Script.CreateDatabbase;
-                cmd.ExecuteNonQuery();
-            }
-
-            if (previousState == ConnectionState.Closed)
-            {
-                _dbConnection.Close();
-            }
-        }
-
         protected override void OnModelCreating(DbModelBuilder mb)
         {
             mb.Configurations.AddFromAssembly(typeof(DbContext).Assembly);
         }
 
-        private static SQLiteConnection CreateConnection(string databaseFile)
-        {
-            var csb = new SQLiteConnectionStringBuilder { DataSource = databaseFile };
-
-            return new SQLiteConnection(csb.ToString());
-        }
-
-        public static void SaveToDatabase(
-            DbContext ctx,
+        public async Task SaveToDatabase(
             IReadOnlyCollection<SeriesInfo> seriesInfos,
             IEnumerable<GroupInfo> groupInfos,
             Dictionary<string, FollowedSeriesLastRead> lastReads)
@@ -100,16 +63,15 @@ namespace BatotoGrabber.EntityModel
                                     ? lr.LastReadDate
                                     : null
                             })
-                        .ToList(),
-                    Image = s.Image
+                        .ToList()
                 });
 
-            ctx.Genres.AddRange(genres.Values);
-            ctx.Creators.AddRange(creators.Values);
-            ctx.Groups.AddRange(groups.Values);
-            ctx.Series.AddRange(series);
+            Genres.AddRange(genres.Values);
+            Creators.AddRange(creators.Values);
+            Groups.AddRange(groups.Values);
+            Series.AddRange(series);
 
-            ctx.SaveChanges();
+            await SaveChangesAsync();
         }
     }
 }

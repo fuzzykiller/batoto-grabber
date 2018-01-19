@@ -1,13 +1,16 @@
 ﻿using CefSharp.WinForms;
 using System;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using BatotoGrabber.EntityModel;
 using BatotoGrabber.Model;
+using BatotoGrabber.Scripts;
 using CefSharp;
 
 namespace BatotoGrabber
@@ -110,25 +113,65 @@ namespace BatotoGrabber
                     await Task.Delay(100, ctsToken);
                 }
 
+                string fileName;
                 using (var sfd = new SaveFileDialog())
                 {
                     sfd.Filter = "SQLite database|*.sqlite";
                     sfd.Title = "Save database";
 
-                    if (sfd.ShowDialog(this) == DialogResult.OK)
+                    if (sfd.ShowDialog(this) != DialogResult.OK)
                     {
-                        var fileExists = File.Exists(sfd.FileName);
-                        using (var ctx = new DbContext(sfd.FileName))
-                        {
-                            if (!fileExists)
-                            {
-                                ctx.CreateDatabase();
-                            }
+                        throw new OperationCanceledException();
+                    }
 
-                            DbContext.SaveToDatabase(ctx, seriesInfos, groupInfos, lastReads);
+                    fileName = sfd.FileName;
+                    File.Delete(sfd.FileName);
+                }
+
+                progressBar.Style = ProgressBarStyle.Marquee;
+                statusLabel.Text = "Saving database...";
+
+                using (var db = new SQLiteConnection($"Data Source={fileName}").OpenAndReturn())
+                {
+                    using (var cmd = db.CreateCommand())
+                    {
+                        cmd.CommandText = Script.CreateDatabbase;
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    using (var ctx = new DbContext(db))
+                    {
+                        await ctx.SaveToDatabase(seriesInfos, groupInfos, lastReads);
+                    }
+
+                    progressBar.Style = ProgressBarStyle.Continuous;
+                    progressBar.Value = 0;
+                    progressBar.Maximum = seriesCount;
+                    statusLabel.Text = "Fetching covers...";
+
+                    using (var updateImageCommand = db.CreateCommand())
+                    {
+                        updateImageCommand.CommandText =
+                            "UPDATE `Series` SET `Image` = @image WHERE `PrimaryName` = @name";
+
+                        for (int i = 0; i < seriesCount; i++)
+                        {
+                            progressBar.Value = i;
+                            var series = seriesInfos[i];
+                            var image = await TryGetCover(series);
+
+                            if (image == null) continue;
+                            
+                            updateImageCommand.Parameters.Clear();
+                            updateImageCommand.Parameters.AddWithValue("@name", series.Name);
+                            updateImageCommand.Parameters.AddWithValue("@image", image);
+
+                            updateImageCommand.ExecuteNonQuery();
                         }
                     }
                 }
+
+                progressBar.Value = progressBar.Maximum;
 
                 MessageBox.Show("Finished! :)");
             }
@@ -143,6 +186,23 @@ namespace BatotoGrabber
 
             startButton.Enabled = true;
             cancelButton.Enabled = false;
+        }
+
+        private static async Task<byte[]> TryGetCover(SeriesInfo series)
+        {
+            var wc = new WebClient { Headers = { ["Referer"] = series.Url } };
+            try
+            {
+                return await wc.DownloadDataTaskAsync(series.ImageUrl);
+            }
+            catch
+            {
+                return null;
+            }
+            finally
+            {
+                wc.Dispose();
+            }
         }
     }
 }

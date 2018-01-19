@@ -64,6 +64,7 @@ namespace BatotoGrabber
             {
                 return new SeriesInfo
                 {
+                    Url = series.Url,
                     Name = series.Name,
                     AltNames = new string[0],
                     Artists = new string[0],
@@ -73,7 +74,7 @@ namespace BatotoGrabber
                     Genres = new string[0],
                     Description = "This series has been removed from Batoto. Your “My Follows” list contains a dead link. :(",
                     Chapters = new ChapterInfo[0],
-                    Image = null
+                    ImageUrl = null
                 };
             }
 
@@ -103,23 +104,9 @@ namespace BatotoGrabber
             metaDataDict.TryGetValue("Type", out var type);
             metaDataDict.TryGetValue("Status", out var status);
 
-            var wc = new WebClient { Headers = { ["Referer"] = series.Url } };
-            byte[] image = null;
-            try
-            {
-                image = await wc.DownloadDataTaskAsync(rawInfo.Image);
-            }
-            catch
-            {
-                // ignore
-            }
-            finally
-            {
-                wc.Dispose();
-            }
-
             return new SeriesInfo
             {
+                Url = series.Url,
                 Name = series.Name,
                 AltNames = altNames,
                 Authors = authors,
@@ -129,10 +116,10 @@ namespace BatotoGrabber
                 Status = status,
                 Description = description,
                 Chapters = rawInfo.Chapters,
-                Image = image
+                ImageUrl = rawInfo.Image
             };
         }
-        
+
         public async Task<GroupInfo> GetGroupInfo(GroupRef groupRef)
         {
             int httpStatus;
