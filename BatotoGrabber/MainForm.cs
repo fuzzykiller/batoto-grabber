@@ -72,7 +72,7 @@ namespace BatotoGrabber
 
                 progressBar.Style = ProgressBarStyle.Continuous;
                 progressBar.Minimum = 0;
-                progressBar.Maximum = followedSeries.Length - 1;
+                progressBar.Maximum = Math.Max(0, followedSeries.Length - 1);
 
                 var seriesInfos = new List<SeriesInfo>();
 
@@ -95,7 +95,7 @@ namespace BatotoGrabber
                     .ToArray();
 
                 progressBar.Value = 0;
-                progressBar.Maximum = groupRefs.Length - 1;
+                progressBar.Maximum = Math.Max(0, groupRefs.Length - 1);
 
                 var groupInfos = new List<GroupInfo>();
 
@@ -146,7 +146,7 @@ namespace BatotoGrabber
 
                     progressBar.Style = ProgressBarStyle.Continuous;
                     progressBar.Value = 0;
-                    progressBar.Maximum = seriesCount;
+                    progressBar.Maximum = Math.Max(0, seriesCount - 1);
                     statusLabel.Text = "Fetching covers...";
 
                     using (var updateImageCommand = db.CreateCommand())
