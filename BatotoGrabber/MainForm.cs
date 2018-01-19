@@ -158,6 +158,7 @@ namespace BatotoGrabber
                         {
                             progressBar.Value = i;
                             var series = seriesInfos[i];
+                            await Task.Delay(100, ctsToken);
                             var image = await TryGetCover(series);
 
                             if (image == null) continue;
@@ -184,6 +185,7 @@ namespace BatotoGrabber
                 MessageBox.Show(this, e.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
+            statusLabel.Text = "Ready";
             startButton.Enabled = true;
             cancelButton.Enabled = false;
         }
