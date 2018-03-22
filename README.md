@@ -1,4 +1,9 @@
+# Deprecated
+
+Batoto is gone. 😪 As such, this project is no longer maintained.
+
 # batoto-grabber
+
 Grab “My Follows” and related data from Batoto
 
 ## What’s saved?
